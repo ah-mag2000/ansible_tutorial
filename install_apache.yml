@@ -4,11 +4,11 @@
   become: true
   tasks:
 
-  - name: update repository index
+  - name: install apache2 and tuned pacakage
     yum:
-      update_cache: yes
-
-  - name: install apache2 pacakage
-    yum:
-      name: httpd
+      name: 
+        - "{{ apache_package }}"
+        - "{{ tuned_package }}"
+        - "{{ nfs_package }}"
       state: latest
+      update_cache: yes
