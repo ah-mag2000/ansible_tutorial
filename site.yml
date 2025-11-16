@@ -2,14 +2,14 @@
 
 - hosts: all
   become: true
-  pre_tasks:
+  tasks:
 
   - name: install apache2 and tuned pacakage
     tags: always
     yum:
       name: 
-        - httpd #"{{ apache_package }}"
-        - tuned #"{{ tuned_package }}"
+        - httpd 
+        - tuned
         - nfs-utils
       state: latest
       update_cache: yes
@@ -50,6 +50,29 @@
       mode: 0755
       owner: root
       group: root
+
+  - name: start httpd
+    tags: apache
+    service:
+      name: httpd
+      state: started
+      enabled: yes
+
+  - name: Change the configurations of the httpd
+    tags: edits
+    lineinfile:
+      path: /etc/httpd/conf/httpd.conf
+      regexp: "^ServerAdmin"
+      line: ServerAdmin something@somewhere.net
+    register: httpd
+
+  - name: restart httpd
+    tags: edits
+    service:
+      name: httpd
+      state: restarted
+    when: httpd.changed
+
 
 
 - hosts: slave_server
