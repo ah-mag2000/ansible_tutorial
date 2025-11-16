@@ -25,6 +25,33 @@
         - kmod-kvdo
       state: latest
 
+
+  - name: copy the file from files to index.html
+    tags: new
+    copy:
+      src: /root/ansible_tutorial/files/default_site.html
+      dest: /var/www/html/index.html
+      mode: 644
+      owner: root
+      group: root
+
+  - name: install unzip
+    yum:
+      name: unzip
+      state: latest
+
+
+  - name: Install Terraform
+    tags: terraform
+    unarchive:
+      src: https://releases.hashicorp.com/terraform/1.13.5/terraform_1.13.5_linux_amd64.zip
+      dest: /usr/local/bin
+      remote_src: yes
+      mode: 0755
+      owner: root
+      group: root
+
+
 - hosts: slave_server
   become: yes
   tasks:
