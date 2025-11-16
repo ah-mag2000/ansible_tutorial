@@ -1,0 +1,35 @@
+---
+
+- hosts: all
+  become: true
+  pre_tasks:
+
+  - name: install apache2 and tuned pacakage
+    tags: always
+    yum:
+      name: 
+        - httpd #"{{ apache_package }}"
+        - tuned #"{{ tuned_package }}"
+        - nfs-utils
+      state: latest
+      update_cache: yes
+
+- hosts: main_server
+  become: true
+  tasks:
+  - name: install the vdo package
+    tags: vdo,kvdo
+    yum:
+      name: 
+        - vdo
+        - kmod-kvdo
+      state: latest
+
+- hosts: slave_server
+  become: yes
+  tasks:
+  - name: install autofs package
+    tags: autofs
+    yum:
+      name: autofs
+      state: latest
