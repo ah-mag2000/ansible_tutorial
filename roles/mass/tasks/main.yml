@@ -1,0 +1,21 @@
+- name: start httpd
+  tags: apache
+  service:
+    name: httpd
+    state: started
+    enabled: yes
+
+- name: Change the configurations of the httpd
+  tags: edits
+  lineinfile:
+    path: /etc/httpd/conf/httpd.conf
+    regexp: "^ServerAdmin"
+    line: ServerAdmin something@somewhere.net
+  register: httpd
+
+- name: restart httpd
+  tags: edits
+  service:
+    name: httpd
+    state: restarted
+  when: httpd.changed

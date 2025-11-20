@@ -1,0 +1,5 @@
+- name: install autofs package
+  tags: autofs
+  yum:
+    name: autofs
+    state: latest

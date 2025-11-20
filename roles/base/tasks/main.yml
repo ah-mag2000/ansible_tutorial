@@ -1,0 +1,20 @@
+- name: add simone user to the servers
+  tags: always
+  user:
+    name: simone
+    groups: root
+
+- name: add ssh key to simone user on servers
+  tags: always
+  authorized_key:
+    user: simone
+    key: "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIL2uBFR+WLEt0SXv1B5nxGSWyc6byZRXp0x76O+qeXvK ansible"
+
+- name: add simone to sudoers for the servers
+  tags: always
+  copy:
+    src: sudoers_simone
+    dest: /etc/sudoers.d/simone
+    owner: root
+    group: root
+    mode: 0440

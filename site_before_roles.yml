@@ -1,0 +1,100 @@
+---
+- hosts: all
+  become: true
+  tasks:
+    - name: install apache2 and tuned pacakage
+      tags: always
+      yum:
+        name:
+          - httpd
+          - tuned
+          - nfs-utils
+        state: latest
+        update_cache: yes
+
+    - name: add simone user to the servers
+      tags: always
+      user:
+        name: simone
+        groups: root
+
+    - name: add ssh key to simone user on servers
+      tags: always
+      authorized_key:
+        user: simone
+        key: "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIL2uBFR+WLEt0SXv1B5nxGSWyc6byZRXp0x76O+qeXvK ansible"
+
+    - name: add simone to sudoers for the servers
+      tags: always
+      copy:
+        src: sudoers_simone
+        dest: /etc/sudoers.d/simone
+        owner: root
+        group: root
+        mode: 0440
+
+- hosts: main_server
+  become: true
+  tasks:
+    - name: install the vdo package
+      tags: vdo,kvdo
+      yum:
+        name:
+          - vdo
+          - kmod-kvdo
+        state: latest
+
+    - name: copy the file from files to index.html
+      tags: new
+      copy:
+        src: /root/ansible_tutorial/files/default_site.html
+        dest: /var/www/html/index.html
+        mode: 644
+        owner: root
+        group: root
+
+    - name: install unzip
+      yum:
+        name: unzip
+        state: latest
+
+    - name: Install Terraform
+      tags: terraform
+      unarchive:
+        src: https://releases.hashicorp.com/terraform/1.13.5/terraform_1.13.5_linux_amd64.zip
+        dest: /usr/local/bin
+        remote_src: yes
+        mode: 0755
+        owner: root
+        group: root
+
+    - name: start httpd
+      tags: apache
+      service:
+        name: httpd
+        state: started
+        enabled: yes
+
+    - name: Change the configurations of the httpd
+      tags: edits
+      lineinfile:
+        path: /etc/httpd/conf/httpd.conf
+        regexp: "^ServerAdmin"
+        line: ServerAdmin something@somewhere.net
+      register: httpd
+
+    - name: restart httpd
+      tags: edits
+      service:
+        name: httpd
+        state: restarted
+      when: httpd.changed
+
+- hosts: slave_server
+  become: yes
+  tasks:
+    - name: install autofs package
+      tags: autofs
+      yum:
+        name: autofs
+        state: latest
