@@ -6,7 +6,7 @@
       tags: always
       yum:
         name:
-          - httpd
+          - "{{apache_package_name}}"
           - tuned
           - nfs-utils
         state: latest

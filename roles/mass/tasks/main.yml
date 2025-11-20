@@ -1,7 +1,7 @@
 - name: start httpd
   tags: apache
   service:
-    name: httpd
+    name: "{{apache_service}}"
     state: started
     enabled: yes
 
@@ -11,11 +11,6 @@
     path: /etc/httpd/conf/httpd.conf
     regexp: "^ServerAdmin"
     line: ServerAdmin something@somewhere.net
-  register: httpd
+  notify: restart_apache
+      #register: httpd
 
-- name: restart httpd
-  tags: edits
-  service:
-    name: httpd
-    state: restarted
-  when: httpd.changed
